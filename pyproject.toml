@@ -7,6 +7,10 @@ requires-python = ">=3.12"
 dependencies = [
     "Django==5.2.9",
     "psycopg2==2.9.11",
+    "django-liveview>=2.1.6",
+    "daphne>=4.1.2",
+    "channels>=4.2.0",
+    "channels-redis>=4.2.1",
 ]
 
 [tool.uv]
@@ -14,13 +18,14 @@ link-mode = "copy"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+DJANGO_SETTINGS_MODULE = "config.settings"
 
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]
 mypy_path = "."
 
 [[tool.mypy.overrides]]
-module = ["debug_toolbar.*"]
+module = ["debug_toolbar.*", "liveview.*", "channels.*", "channels_redis.*", "daphne.*"]
 ignore_missing_imports = true
 
 [tool.django-stubs]

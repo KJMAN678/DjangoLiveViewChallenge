@@ -1,0 +1,95 @@
+<div class="header">
+    <h1>Trello風TODOアプリ</h1>
+</div>
+<div class="container">
+    <div class="boards-container">
+        {% for board in boards %}
+        <div class="board-card" onclick="openBoard({{ board.id }})">
+            <h3>{{ board.name }}</h3>
+            <div class="actions" onclick="event.stopPropagation()">
+                <button onclick="showEditBoardModal({{ board.id }}, '{{ board.name|escapejs }}')">編集</button>
+                <button onclick="deleteBoard({{ board.id }})">削除</button>
+            </div>
+        </div>
+        {% empty %}
+        <p style="color: white;">ボードがありません。新しいボードを作成してください。</p>
+        {% endfor %}
+        <div class="new-board-card" onclick="showNewBoardModal()">
+            <span>+ 新しいボードを作成</span>
+        </div>
+    </div>
+</div>
+
+<div id="modal-container"></div>
+
+<script>
+function openBoard(boardId) {
+    sendData({action: "board_detail->send_page", data: {board_id: boardId}});
+}
+
+function showNewBoardModal() {
+    const modal = document.getElementById('modal-container');
+    modal.innerHTML = `
+        <div class="modal-overlay" onclick="closeModal()">
+            <div class="modal" onclick="event.stopPropagation()">
+                <h3>新しいボードを作成</h3>
+                <input type="text" id="board-name" placeholder="ボード名を入力" autofocus>
+                <div class="btn-group">
+                    <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
+                    <button class="btn-primary" onclick="createBoard()">作成</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById('board-name').focus();
+    document.getElementById('board-name').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') createBoard();
+    });
+}
+
+function showEditBoardModal(boardId, currentName) {
+    const modal = document.getElementById('modal-container');
+    modal.innerHTML = `
+        <div class="modal-overlay" onclick="closeModal()">
+            <div class="modal" onclick="event.stopPropagation()">
+                <h3>ボードを編集</h3>
+                <input type="text" id="board-name" value="${currentName}" autofocus>
+                <div class="btn-group">
+                    <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
+                    <button class="btn-primary" onclick="updateBoard(${boardId})">保存</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById('board-name').focus();
+    document.getElementById('board-name').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') updateBoard(boardId);
+    });
+}
+
+function closeModal() {
+    document.getElementById('modal-container').innerHTML = '';
+}
+
+function createBoard() {
+    const name = document.getElementById('board-name').value.trim();
+    if (name) {
+        sendData({action: "boards->create", data: {name: name}});
+        closeModal();
+    }
+}
+
+function updateBoard(boardId) {
+    const name = document.getElementById('board-name').value.trim();
+    if (name) {
+        sendData({action: "boards->update", data: {board_id: boardId, name: name}});
+        closeModal();
+    }
+}
+
+function deleteBoard(boardId) {
+    if (confirm('このボードを削除しますか？')) {
+        sendData({action: "boards->delete", data: {board_id: boardId}});
+    }
+}
+</script>

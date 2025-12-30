@@ -1,14 +1,20 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
-        <meta name="description" content="Django Template">
-        <meta name="keywords" content="Django">
+        <meta name="description" content="Trello風TODOアプリ">
+        <meta name="keywords" content="Django, LiveView, Trello, TODO">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Django Template</title>
+        <title id="title">{% block title %}Trello風TODOアプリ{% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
     </head>
-    <body>
-        {% block content %}
-        {% endblock %}
+    <body data-host="{{ request.get_host }}">
+        <div id="notifications"></div>
+        <div id="main">
+            {% block content %}
+            {% endblock %}
+        </div>
+        <script type="module" src="{% static 'js/main.js' %}"></script>
     </body>
 </html>

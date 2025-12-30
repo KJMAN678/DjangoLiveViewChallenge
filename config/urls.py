@@ -4,8 +4,7 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("web/", include("web.urls")),
-    # path("__debug__/", include("debug_toolbar.urls")),
+    path("", include("web.urls")),
 ]
 
 if settings.DEBUG:
