@@ -17,7 +17,7 @@ function renderHTML(data) {
     }
 }
 
-export function connect(url = `${'https:' === document.location.protocol ? 'wss' : 'ws'}://${document.body.dataset.host}/ws/liveview/`) {
+export function connect(url = `${'https:' === document.location.protocol ? 'wss' : 'ws'}://${document.body.dataset.host}/ws/liveview/main`) {
     console.log("Connecting to WebSockets server...");
     window.myWebSocket = new WebSocket(url);
     return window.myWebSocket;
@@ -26,9 +26,12 @@ export function connect(url = `${'https:' === document.location.protocol ? 'wss'
 export function sendData(message, webSocket = window.myWebSocket) {
     if (webSocket.readyState === WebSocket.OPEN) {
         const messageFull = message;
+        messageFull.function = messageFull.function || messageFull.action;
         messageFull.data = messageFull.data || {};
         messageFull.data.lang = document.querySelector("html").getAttribute("lang") || "ja";
         webSocket.send(JSON.stringify(messageFull));
+    } else {
+        console.warn("WebSocket not connected. readyState:", webSocket.readyState);
     }
 }
 

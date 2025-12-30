@@ -2,5 +2,5 @@ import { connect, startEvents, sendData } from './websocket.js';
 
 window.sendData = sendData;
 
-connect();
-startEvents();
+const ws = connect();
+startEvents(ws);
