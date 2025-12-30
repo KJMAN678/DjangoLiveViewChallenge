@@ -50,8 +50,23 @@ def send_page(consumer, content):
             send(consumer, response_data)
 
 
-@liveview_handler("board_detail->create_list")
-def create_list(consumer, content):
+@liveview_handler("board_detail->update_board_name")
+def update_board_name(consumer, content):
+    data = content.get("data", {})
+    board_id = data.get("board_id")
+    name = data.get("name", "").strip()
+    if board_id and name:
+        try:
+            board = Board.objects.get(id=board_id)
+            board.name = name
+            board.save()
+            broadcast_board_update(consumer, board_id)
+        except Board.DoesNotExist:
+            pass
+
+
+@liveview_handler("board_detail->add_list")
+def add_list(consumer, content):
     data = content.get("data", {})
     board_id = data.get("board_id")
     name = data.get("name", "").strip()
@@ -65,8 +80,8 @@ def create_list(consumer, content):
             pass
 
 
-@liveview_handler("board_detail->update_list")
-def update_list(consumer, content):
+@liveview_handler("board_detail->edit_list")
+def edit_list(consumer, content):
     data = content.get("data", {})
     list_id = data.get("list_id")
     name = data.get("name", "").strip()
@@ -81,8 +96,8 @@ def update_list(consumer, content):
             pass
 
 
-@liveview_handler("board_detail->delete_list")
-def delete_list(consumer, content):
+@liveview_handler("board_detail->remove_list")
+def remove_list(consumer, content):
     data = content.get("data", {})
     list_id = data.get("list_id")
     board_id = data.get("board_id")
@@ -96,8 +111,8 @@ def delete_list(consumer, content):
             pass
 
 
-@liveview_handler("board_detail->create_card")
-def create_card(consumer, content):
+@liveview_handler("board_detail->add_card")
+def add_card(consumer, content):
     data = content.get("data", {})
     list_id = data.get("list_id")
     title = data.get("title", "").strip()
@@ -112,8 +127,8 @@ def create_card(consumer, content):
             pass
 
 
-@liveview_handler("board_detail->update_card")
-def update_card(consumer, content):
+@liveview_handler("board_detail->edit_card")
+def edit_card(consumer, content):
     data = content.get("data", {})
     card_id = data.get("card_id")
     title = data.get("title", "").strip()
@@ -130,8 +145,8 @@ def update_card(consumer, content):
             pass
 
 
-@liveview_handler("board_detail->delete_card")
-def delete_card(consumer, content):
+@liveview_handler("board_detail->remove_card")
+def remove_card(consumer, content):
     data = content.get("data", {})
     card_id = data.get("card_id")
     board_id = data.get("board_id")
@@ -145,11 +160,11 @@ def delete_card(consumer, content):
             pass
 
 
-@liveview_handler("board_detail->move_list")
-def move_list(consumer, content):
+@liveview_handler("board_detail->reorder_list")
+def reorder_list(consumer, content):
     data = content.get("data", {})
     list_id = data.get("list_id")
-    new_position = data.get("new_position")
+    new_position = data.get("target_position") or data.get("new_position")
     board_id = data.get("board_id")
     if list_id is not None and new_position is not None:
         try:
@@ -166,12 +181,12 @@ def move_list(consumer, content):
             pass
 
 
-@liveview_handler("board_detail->move_card")
-def move_card(consumer, content):
+@liveview_handler("board_detail->reorder_card")
+def reorder_card(consumer, content):
     data = content.get("data", {})
     card_id = data.get("card_id")
     target_list_id = data.get("target_list_id")
-    new_position = data.get("new_position")
+    new_position = data.get("target_position") or data.get("new_position")
     board_id = data.get("board_id")
     if card_id is not None and target_list_id is not None and new_position is not None:
         try:
