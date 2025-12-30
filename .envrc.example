@@ -1,0 +1,7 @@
+export DJANGO_SUPERUSER_USERNAME=hoge
+export DJANGO_SUPERUSER_EMAIL=hoge@test.com
+export DJANGO_SUPERUSER_PASSWORD=hogehoge
+export DJANGO_SECRET_KEY=hogehoge
+export POSTGRES_DB=postgres
+export POSTGRES_USER=postgres
+export POSTGRES_PASSWORD=postgres
