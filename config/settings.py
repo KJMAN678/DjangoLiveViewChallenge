@@ -38,7 +38,6 @@ THIRD_PARTY_APPS = [
     "daphne",
     "channels",
     "liveview",
-    # "debug_toolbar",
 ]
 
 CUSTOM_APPS = [
@@ -58,9 +57,6 @@ BASE_MIDDLEWARE = [
 ]
 
 THIRD_PARTY_MIDDLEWARE = []
-
-# if DEBUG:
-#     THIRD_PARTY_MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
 
 MIDDLEWARE = BASE_MIDDLEWARE + THIRD_PARTY_MIDDLEWARE
 
@@ -145,8 +141,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
-
-# DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: settings.DEBUG}
 
 # Django Channels
 CHANNEL_LAYERS = {
