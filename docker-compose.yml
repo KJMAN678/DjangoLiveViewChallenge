@@ -21,7 +21,7 @@ services:
       - redis
 
   db:
-    image: postgres:17.5-alpine3.21
+    image: postgres:18.1-alpine3.22
     ports:
         - "5432:5432"
     environment:
@@ -35,7 +35,7 @@ services:
       retries: 5
 
   redis:
-    image: redis:7-alpine
+    image: redis:8.4.0-alpine
     ports:
       - "6379:6379"
     healthcheck:
