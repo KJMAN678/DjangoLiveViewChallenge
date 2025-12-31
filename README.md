@@ -10,6 +10,7 @@ $ docker compose run --rm backend uv run ruff format .
 $ docker compose run --rm backend uv run djlint templates/*/*.html --extension=html.j2 --reformat
 
 http://127.0.0.1:8000/
+http://127.0.0.1:8000/admin/
 
 # セキュリティチェック
 $ docker compose run --rm backend uv tool run djcheckup http://host.docker.internal:8000/web/
