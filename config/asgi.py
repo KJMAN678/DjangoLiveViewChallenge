@@ -34,7 +34,7 @@ application = ProtocolTypeRouter(
         "websocket": AuthMiddlewareStack(
             AllowedHostsOriginValidator(
                 URLRouter(
-                    [re_path(r"^ws/liveview/(?P<room_name>\w*)$", LiveViewConsumer.as_asgi())]
+                    [re_path(r"^ws/liveview/(?P<room_name>[\w-]*)/$", LiveViewConsumer.as_asgi())]
                 )
             )
         ),

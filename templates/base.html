@@ -9,13 +9,16 @@
         <title id="title">{% block title %}Trello風TODOアプリ{% endblock %}</title>
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
     </head>
-    <body data-host="{{ request.get_host }}">
-        <div id="notifications"></div>
-        <div id="main">
+    <body>
+        <div id="no-connection" class="no-connection--hide">
+            <div class="no-connection-content">
+                <p>接続が切断されました。再接続中...</p>
+            </div>
+        </div>
+        <div id="main" data-controller="page">
             {% block content %}
             {% endblock %}
         </div>
-            <script type="module" src="{% static 'js/main.js' %}"></script>
-            <script src="{% static 'js/board_detail.js' %}"></script>
-        </body>
+        <script src="{% static 'liveview/liveview.js' %}"></script>
+    </body>
 </html>
