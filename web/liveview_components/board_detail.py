@@ -39,7 +39,7 @@ def broadcast_board_update(consumer, board_id):
     html = render_board_detail_html(board_id)
     if html:
         data = {
-            "selector": "#main",
+            "target": "#main",
             "html": html,
         }
         consumer.broadcast_to_all(data)
@@ -54,7 +54,7 @@ def send_page(consumer, content):
         if context:
             html = render_to_string("web/pages/board_detail.html", context)
             response_data = {
-                "selector": "#main",
+                "target": "#main",
                 "html": html,
                 "url": f"/board/{board_id}/",
                 "title": context["title"],
@@ -69,7 +69,7 @@ def show_edit_board_name(consumer, content):
     if board_id:
         html = render_board_detail_html(board_id, editing_board_name=True)
         if html:
-            send(consumer, {"selector": "#main", "html": html})
+            send(consumer, {"target": "#main", "html": html})
 
 
 @liveview_handler("board_detail->update_board_name")
@@ -95,7 +95,7 @@ def show_add_list_form(consumer, content):
     if board_id:
         html = render_board_detail_html(board_id, show_add_list_form=True)
         if html:
-            send(consumer, {"selector": "#main", "html": html})
+            send(consumer, {"target": "#main", "html": html})
 
 
 @liveview_handler("board_detail->add_list")
@@ -126,7 +126,7 @@ def show_edit_list(consumer, content):
             list_id = None
         html = render_board_detail_html(board_id, editing_list_id=list_id)
         if html:
-            send(consumer, {"selector": "#main", "html": html})
+            send(consumer, {"target": "#main", "html": html})
 
 
 @liveview_handler("board_detail->edit_list")
@@ -216,7 +216,7 @@ def show_add_card_form(consumer, content):
             list_id = None
         html = render_board_detail_html(board_id, adding_card_to_list_id=list_id)
         if html:
-            send(consumer, {"selector": "#main", "html": html})
+            send(consumer, {"target": "#main", "html": html})
 
 
 @liveview_handler("board_detail->add_card")
@@ -248,7 +248,7 @@ def show_edit_card(consumer, content):
             card_id = None
         html = render_board_detail_html(board_id, editing_card_id=card_id)
         if html:
-            send(consumer, {"selector": "#main", "html": html})
+            send(consumer, {"target": "#main", "html": html})
 
 
 @liveview_handler("board_detail->edit_card")

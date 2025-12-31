@@ -443,3 +443,24 @@ body {
 .hidden {
     display: none !important;
 }
+
+.no-connection--hide {
+    display: none !important;
+}
+
+.no-connection--show {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #eb5a46;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    z-index: 9999;
+}
+
+.no-connection-content {
+    font-size: 0.875rem;
+}

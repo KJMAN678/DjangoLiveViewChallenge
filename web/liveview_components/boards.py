@@ -22,7 +22,7 @@ def render_boards_html(show_new_board_form=False, editing_board_id=None):
 def broadcast_boards_update(consumer):
     html = render_boards_html()
     data = {
-        "selector": "#main",
+        "target": "#main",
         "html": html,
     }
     consumer.broadcast_to_all(data)
@@ -33,7 +33,7 @@ def send_page(consumer, content):
     context = get_boards_context()
     html = render_to_string("web/pages/boards.html", context)
     data = {
-        "selector": "#main",
+        "target": "#main",
         "html": html,
         "url": "/",
         "title": context["title"],
@@ -46,7 +46,7 @@ def show_new_form(consumer, content):
     context = get_boards_context(show_new_board_form=True)
     html = render_to_string("web/pages/boards.html", context)
     data = {
-        "selector": "#main",
+        "target": "#main",
         "html": html,
     }
     send(consumer, data)
@@ -64,7 +64,7 @@ def show_edit(consumer, content):
     context = get_boards_context(editing_board_id=board_id)
     html = render_to_string("web/pages/boards.html", context)
     data = {
-        "selector": "#main",
+        "target": "#main",
         "html": html,
     }
     send(consumer, data)
@@ -80,7 +80,7 @@ def create(consumer, content):
     else:
         html = render_boards_html()
         response_data = {
-            "selector": "#main",
+            "target": "#main",
             "html": html,
         }
         send(consumer, response_data)
@@ -103,7 +103,7 @@ def update(consumer, content):
     else:
         html = render_boards_html()
         response_data = {
-            "selector": "#main",
+            "target": "#main",
             "html": html,
         }
         send(consumer, response_data)
@@ -123,7 +123,7 @@ def delete(consumer, content):
     else:
         html = render_boards_html()
         response_data = {
-            "selector": "#main",
+            "target": "#main",
             "html": html,
         }
         send(consumer, response_data)
