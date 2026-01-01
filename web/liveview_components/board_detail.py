@@ -1,3 +1,12 @@
+"""
+ボード詳細ページのLiveViewハンドラモジュール
+
+ボード詳細ページでのリスト・カードのCRUD操作と並び替えを
+処理するWebSocketハンドラを定義します。
+Django-LiveViewのliveview_handlerデコレータを使用して、
+クライアントからのアクションに応答します。
+"""
+
 from django.template.loader import render_to_string
 from liveview.connections import send
 from liveview.decorators import liveview_handler
@@ -13,6 +22,20 @@ def get_board_detail_context(
     adding_card_to_list_id=None,
     show_add_list_form=False,
 ):
+    """
+    ボード詳細ページのコンテキストデータを取得する。
+
+    Args:
+        board_id: ボードID
+        editing_board_name: ボード名編集フォームを表示するかどうか
+        editing_list_id: 編集中のリストID
+        editing_card_id: 編集中のカードID
+        adding_card_to_list_id: カード追加フォームを表示するリストID
+        show_add_list_form: リスト追加フォームを表示するかどうか
+
+    Returns:
+        dict: テンプレートに渡すコンテキスト辞書、ボードが存在しない場合はNone
+    """
     try:
         board = Board.objects.prefetch_related("lists__cards").get(id=board_id)
         return {
@@ -29,6 +52,16 @@ def get_board_detail_context(
 
 
 def render_board_detail_html(board_id, **kwargs):
+    """
+    ボード詳細ページのHTMLをレンダリングする。
+
+    Args:
+        board_id: ボードID
+        **kwargs: get_board_detail_contextに渡す追加引数
+
+    Returns:
+        str: レンダリングされたHTML文字列、ボードが存在しない場合はNone
+    """
     context = get_board_detail_context(board_id, **kwargs)
     if context:
         return render_to_string("web/pages/board_detail.html", context)
@@ -36,6 +69,16 @@ def render_board_detail_html(board_id, **kwargs):
 
 
 def broadcast_board_update(consumer, board_id):
+    """
+    全クライアントにボード詳細の更新をブロードキャストする。
+
+    同じWebSocketルームに接続している全クライアントに
+    最新のボード詳細HTMLを送信します。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        board_id: ボードID
+    """
     html = render_board_detail_html(board_id)
     if html:
         data = {
@@ -47,6 +90,16 @@ def broadcast_board_update(consumer, board_id):
 
 @liveview_handler("board_detail->send_page")
 def send_page(consumer, content):
+    """
+    ボード詳細ページを送信する。
+
+    SPA遷移時にボード詳細ページのHTMLを送信し、
+    URLとタイトルも更新します。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（board_idを含む）
+    """
     data = content.get("data", {})
     board_id = data.get("board_id")
     if board_id:
@@ -64,6 +117,16 @@ def send_page(consumer, content):
 
 @liveview_handler("board_detail->show_edit_board_name")
 def show_edit_board_name(consumer, content):
+    """
+    ボード名編集フォームを表示する。
+
+    ボード名の編集フォームを表示した状態で
+    HTMLを再レンダリングして送信します。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（board_idを含む）
+    """
     payload = content.get("data", {})
     board_id = payload.get("board_id")
     if board_id:
@@ -74,6 +137,16 @@ def show_edit_board_name(consumer, content):
 
 @liveview_handler("board_detail->update_board_name")
 def update_board_name(consumer, content):
+    """
+    ボード名を更新する。
+
+    フォームから送信された新しいボード名でボードを更新し、
+    全クライアントに更新をブロードキャストします。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（board_idとフォームデータを含む）
+    """
     payload = content.get("data", {})
     form_data = content.get("form", {})
     board_id = payload.get("board_id")
@@ -90,6 +163,16 @@ def update_board_name(consumer, content):
 
 @liveview_handler("board_detail->show_add_list_form")
 def show_add_list_form(consumer, content):
+    """
+    リスト追加フォームを表示する。
+
+    新規リスト追加フォームを表示した状態で
+    HTMLを再レンダリングして送信します。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（board_idを含む）
+    """
     payload = content.get("data", {})
     board_id = payload.get("board_id")
     if board_id:
@@ -100,6 +183,17 @@ def show_add_list_form(consumer, content):
 
 @liveview_handler("board_detail->add_list")
 def add_list(consumer, content):
+    """
+    新規リストを追加する。
+
+    フォームから送信されたリスト名で新規リストを作成し、
+    全クライアントに更新をブロードキャストします。
+    リストは末尾に追加されます。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（board_idとフォームデータを含む）
+    """
     payload = content.get("data", {})
     form_data = content.get("form", {})
     board_id = payload.get("board_id")
@@ -116,6 +210,16 @@ def add_list(consumer, content):
 
 @liveview_handler("board_detail->show_edit_list")
 def show_edit_list(consumer, content):
+    """
+    リスト編集フォームを表示する。
+
+    指定されたリストの編集フォームを表示した状態で
+    HTMLを再レンダリングして送信します。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（board_idとlist_idを含む）
+    """
     payload = content.get("data", {})
     board_id = payload.get("board_id")
     list_id = payload.get("list_id")
@@ -131,6 +235,16 @@ def show_edit_list(consumer, content):
 
 @liveview_handler("board_detail->edit_list")
 def edit_list(consumer, content):
+    """
+    リスト名を更新する。
+
+    フォームから送信された新しいリスト名でリストを更新し、
+    全クライアントに更新をブロードキャストします。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（list_idとフォームデータを含む）
+    """
     payload = content.get("data", {})
     form_data = content.get("form", {})
     list_id = payload.get("list_id")
@@ -148,6 +262,16 @@ def edit_list(consumer, content):
 
 @liveview_handler("board_detail->remove_list")
 def remove_list(consumer, content):
+    """
+    リストを削除する。
+
+    指定されたリストを削除し、全クライアントに更新をブロードキャストします。
+    リストに含まれるカードも連鎖的に削除されます。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（list_idを含む）
+    """
     payload = content.get("data", {})
     list_id = payload.get("list_id")
     board_id = payload.get("board_id")
@@ -163,6 +287,16 @@ def remove_list(consumer, content):
 
 @liveview_handler("board_detail->move_list_left")
 def move_list_left(consumer, content):
+    """
+    リストを左に移動する。
+
+    指定されたリストの位置を1つ左（前）に移動し、
+    全クライアントに更新をブロードキャストします。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（list_idを含む）
+    """
     payload = content.get("data", {})
     list_id = payload.get("list_id")
     board_id = payload.get("board_id")
@@ -185,6 +319,16 @@ def move_list_left(consumer, content):
 
 @liveview_handler("board_detail->move_list_right")
 def move_list_right(consumer, content):
+    """
+    リストを右に移動する。
+
+    指定されたリストの位置を1つ右（後）に移動し、
+    全クライアントに更新をブロードキャストします。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（list_idを含む）
+    """
     payload = content.get("data", {})
     list_id = payload.get("list_id")
     board_id = payload.get("board_id")
@@ -206,6 +350,16 @@ def move_list_right(consumer, content):
 
 @liveview_handler("board_detail->show_add_card_form")
 def show_add_card_form(consumer, content):
+    """
+    カード追加フォームを表示する。
+
+    指定されたリストにカード追加フォームを表示した状態で
+    HTMLを再レンダリングして送信します。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（board_idとlist_idを含む）
+    """
     payload = content.get("data", {})
     board_id = payload.get("board_id")
     list_id = payload.get("list_id")
@@ -221,6 +375,17 @@ def show_add_card_form(consumer, content):
 
 @liveview_handler("board_detail->add_card")
 def add_card(consumer, content):
+    """
+    新規カードを追加する。
+
+    フォームから送信されたカードタイトルで新規カードを作成し、
+    全クライアントに更新をブロードキャストします。
+    カードはリストの末尾に追加されます。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（list_idとフォームデータを含む）
+    """
     payload = content.get("data", {})
     form_data = content.get("form", {})
     list_id = payload.get("list_id")
@@ -238,6 +403,16 @@ def add_card(consumer, content):
 
 @liveview_handler("board_detail->show_edit_card")
 def show_edit_card(consumer, content):
+    """
+    カード編集フォームを表示する。
+
+    指定されたカードの編集フォームを表示した状態で
+    HTMLを再レンダリングして送信します。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（board_idとcard_idを含む）
+    """
     payload = content.get("data", {})
     board_id = payload.get("board_id")
     card_id = payload.get("card_id")
@@ -253,6 +428,16 @@ def show_edit_card(consumer, content):
 
 @liveview_handler("board_detail->edit_card")
 def edit_card(consumer, content):
+    """
+    カードタイトルを更新する。
+
+    フォームから送信された新しいタイトルでカードを更新し、
+    全クライアントに更新をブロードキャストします。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（card_idとフォームデータを含む）
+    """
     payload = content.get("data", {})
     form_data = content.get("form", {})
     card_id = payload.get("card_id")
@@ -270,6 +455,15 @@ def edit_card(consumer, content):
 
 @liveview_handler("board_detail->remove_card")
 def remove_card(consumer, content):
+    """
+    カードを削除する。
+
+    指定されたカードを削除し、全クライアントに更新をブロードキャストします。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（card_idを含む）
+    """
     payload = content.get("data", {})
     card_id = payload.get("card_id")
     board_id = payload.get("board_id")
@@ -285,6 +479,16 @@ def remove_card(consumer, content):
 
 @liveview_handler("board_detail->move_card_up")
 def move_card_up(consumer, content):
+    """
+    カードを上に移動する。
+
+    指定されたカードの位置を1つ上（前）に移動し、
+    全クライアントに更新をブロードキャストします。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（card_idとlist_idを含む）
+    """
     payload = content.get("data", {})
     card_id = payload.get("card_id")
     list_id = payload.get("list_id")
@@ -307,6 +511,16 @@ def move_card_up(consumer, content):
 
 @liveview_handler("board_detail->move_card_down")
 def move_card_down(consumer, content):
+    """
+    カードを下に移動する。
+
+    指定されたカードの位置を1つ下（後）に移動し、
+    全クライアントに更新をブロードキャストします。
+
+    Args:
+        consumer: WebSocketコンシューマーインスタンス
+        content: クライアントから送信されたデータ（card_idとlist_idを含む）
+    """
     payload = content.get("data", {})
     card_id = payload.get("card_id")
     list_id = payload.get("list_id")

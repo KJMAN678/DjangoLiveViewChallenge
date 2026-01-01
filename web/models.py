@@ -1,8 +1,26 @@
+"""
+モデルモジュール
+
+Trello風TODOアプリのデータモデルを定義します。
+Board（ボード）、List（リスト）、Card（カード）の3層構造で
+タスクを管理します。
+"""
+
 from django.db import models
 
 
 class Board(models.Model):
-    """ボード（Trelloのボードに相当）"""
+    """
+    ボードモデル（Trelloのボードに相当）。
+
+    複数のリストを含むことができる最上位のコンテナです。
+    プロジェクトやカテゴリごとにボードを作成して管理します。
+
+    Attributes:
+        name: ボードの名前
+        created_at: 作成日時（自動設定）
+        updated_at: 更新日時（自動更新）
+    """
 
     name = models.CharField(max_length=255, verbose_name="ボード名")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="作成日時")
@@ -14,11 +32,29 @@ class Board(models.Model):
         verbose_name_plural = "ボード"
 
     def __str__(self) -> str:
+        """
+        ボードの文字列表現を返す。
+
+        Returns:
+            str: ボード名
+        """
         return self.name
 
 
 class List(models.Model):
-    """リスト（Trelloのリスト/カラムに相当）"""
+    """
+    リストモデル（Trelloのリスト/カラムに相当）。
+
+    ボード内でカードをグループ化するためのコンテナです。
+    「TODO」「進行中」「完了」などのステータスを表現するのに使用します。
+
+    Attributes:
+        board: 所属するボード（外部キー）
+        name: リストの名前
+        position: 表示順序（0から始まる整数）
+        created_at: 作成日時（自動設定）
+        updated_at: 更新日時（自動更新）
+    """
 
     board = models.ForeignKey(
         Board,
@@ -37,11 +73,29 @@ class List(models.Model):
         verbose_name_plural = "リスト"
 
     def __str__(self) -> str:
+        """
+        リストの文字列表現を返す。
+
+        Returns:
+            str: リスト名
+        """
         return self.name
 
 
 class Card(models.Model):
-    """カード（Trelloのカード/タスクに相当）"""
+    """
+    カードモデル（Trelloのカード/タスクに相当）。
+
+    個々のタスクや作業項目を表します。
+    リスト内で上下に並び替えることができます。
+
+    Attributes:
+        list: 所属するリスト（外部キー）
+        title: カードのタイトル
+        position: 表示順序（0から始まる整数）
+        created_at: 作成日時（自動設定）
+        updated_at: 更新日時（自動更新）
+    """
 
     list = models.ForeignKey(
         List,
@@ -60,4 +114,10 @@ class Card(models.Model):
         verbose_name_plural = "カード"
 
     def __str__(self) -> str:
+        """
+        カードの文字列表現を返す。
+
+        Returns:
+            str: カードのタイトル
+        """
         return self.title
