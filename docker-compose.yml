@@ -14,12 +14,14 @@ services:
       - "POSTGRES_DB=${POSTGRES_DB}"
       - "POSTGRES_USER=${POSTGRES_USER}"
       - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+      - "REDIS_URI=redis://redis:6379/0"
     command: sh /app/start.sh
     depends_on:
       - db
+      - redis
 
   db:
-    image: postgres:17.5-alpine3.21
+    image: postgres:18.1-alpine3.22
     ports:
         - "5432:5432"
     environment:
@@ -28,6 +30,16 @@ services:
       - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8.4.0-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5

@@ -1,0 +1,46 @@
+<div class="header">
+    <h1>Trello風TODOアプリ</h1>
+</div>
+<div class="container">
+    <div class="boards-container">
+        {% for board in boards %}
+        <div class="board-card">
+            {% if editing_board_id == board.id %}
+            <form data-action="submit->page#run" data-liveview-function="boards->update" data-board-id="{{ board.id }}">
+                <input type="text" name="name" value="{{ board.name }}" data-liveview-focus="true">
+                <div class="btn-group">
+                    <button type="button" data-action="click->page#run" data-liveview-function="boards->send_page" class="btn-secondary">キャンセル</button>
+                    <button type="submit" class="btn-primary">保存</button>
+                </div>
+            </form>
+            {% else %}
+            <div data-action="click->page#run" data-liveview-function="board_detail->send_page" data-board-id="{{ board.id }}" style="cursor: pointer;">
+                <h3>{{ board.name }}</h3>
+            </div>
+            <div class="actions">
+                <button data-action="click->page#run" data-liveview-function="boards->show_edit" data-board-id="{{ board.id }}">編集</button>
+                <button data-action="click->page#run" data-liveview-function="boards->delete" data-board-id="{{ board.id }}">削除</button>
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <p style="color: white;">ボードがありません。新しいボードを作成してください。</p>
+        {% endfor %}
+
+        {% if show_new_board_form %}
+        <div class="board-card new-board-form">
+            <form data-action="submit->page#run" data-liveview-function="boards->create">
+                <input type="text" name="name" placeholder="ボード名を入力" data-liveview-focus="true">
+                <div class="btn-group">
+                    <button type="button" data-action="click->page#run" data-liveview-function="boards->send_page" class="btn-secondary">キャンセル</button>
+                    <button type="submit" class="btn-primary">作成</button>
+                </div>
+            </form>
+        </div>
+        {% else %}
+        <div class="new-board-card" data-action="click->page#run" data-liveview-function="boards->show_new_form">
+            <span>+ 新しいボードを作成</span>
+        </div>
+        {% endif %}
+    </div>
+</div>

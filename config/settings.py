@@ -35,14 +35,16 @@ BASE_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    "debug_toolbar",
+    "daphne",
+    "channels",
+    "liveview",
 ]
 
 CUSTOM_APPS = [
     "web",
 ]
 
-INSTALLED_APPS = BASE_APPS + THIRD_PARTY_APPS + CUSTOM_APPS
+INSTALLED_APPS = THIRD_PARTY_APPS + BASE_APPS + CUSTOM_APPS
 
 BASE_MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -55,9 +57,6 @@ BASE_MIDDLEWARE = [
 ]
 
 THIRD_PARTY_MIDDLEWARE = []
-
-if DEBUG:
-    THIRD_PARTY_MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
 
 MIDDLEWARE = BASE_MIDDLEWARE + THIRD_PARTY_MIDDLEWARE
 
@@ -79,6 +78,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
 
 
 # Database
@@ -131,6 +131,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -141,4 +142,13 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: settings.DEBUG}
+# Django Channels
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [os.environ.get("REDIS_URI", "redis://localhost:6379/0")]},
+    }
+}
+
+# LiveView
+LIVEVIEW_APPS = ["web"]

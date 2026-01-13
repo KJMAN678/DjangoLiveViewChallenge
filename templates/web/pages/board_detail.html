@@ -1,0 +1,107 @@
+<div class="board-view" data-board-id="{{ board.id }}">
+    <div class="board-header">
+        {% if editing_board_name %}
+        <form data-action="submit->page#run" data-liveview-function="board_detail->update_board_name" data-board-id="{{ board.id }}">
+            <input type="text" name="name" value="{{ board.name }}" data-liveview-focus="true">
+            <div class="btn-group">
+                <button type="button" data-action="click->page#run" data-liveview-function="board_detail->send_page" data-board-id="{{ board.id }}" class="btn-secondary">キャンセル</button>
+                <button type="submit" class="btn-primary">保存</button>
+            </div>
+        </form>
+        {% else %}
+        <h2>{{ board.name }}</h2>
+        <div class="actions">
+            <button data-action="click->page#run" data-liveview-function="board_detail->show_edit_board_name" data-board-id="{{ board.id }}">ボード名を編集</button>
+            <button data-action="click->page#run" data-liveview-function="boards->send_page">ボード一覧に戻る</button>
+        </div>
+        {% endif %}
+    </div>
+    <div class="lists-container" id="lists-container">
+        {% for list in board.lists.all %}
+        <div class="list" data-list-id="{{ list.id }}" data-position="{{ list.position }}">
+            <div class="list-header">
+                {% if editing_list_id == list.id %}
+                <form data-action="submit->page#run" data-liveview-function="board_detail->edit_list" data-list-id="{{ list.id }}" data-board-id="{{ board.id }}">
+                    <input type="text" name="name" value="{{ list.name }}" data-liveview-focus="true">
+                    <div class="btn-group">
+                        <button type="button" data-action="click->page#run" data-liveview-function="board_detail->send_page" data-board-id="{{ board.id }}" class="btn-secondary">キャンセル</button>
+                        <button type="submit" class="btn-primary">保存</button>
+                    </div>
+                </form>
+                {% else %}
+                <h3>{{ list.name }}</h3>
+                <div class="actions">
+                    <button data-action="click->page#run" data-liveview-function="board_detail->show_edit_list" data-list-id="{{ list.id }}" data-board-id="{{ board.id }}">編集</button>
+                    <button data-action="click->page#run" data-liveview-function="board_detail->remove_list" data-list-id="{{ list.id }}" data-board-id="{{ board.id }}">削除</button>
+                </div>
+                <div class="move-buttons">
+                    {% if not forloop.first %}
+                    <button data-action="click->page#run" data-liveview-function="board_detail->move_list_left" data-list-id="{{ list.id }}" data-board-id="{{ board.id }}" title="左へ移動">←</button>
+                    {% endif %}
+                    {% if not forloop.last %}
+                    <button data-action="click->page#run" data-liveview-function="board_detail->move_list_right" data-list-id="{{ list.id }}" data-board-id="{{ board.id }}" title="右へ移動">→</button>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="cards-container" data-list-id="{{ list.id }}">
+                {% for card in list.cards.all %}
+                <div class="card" data-card-id="{{ card.id }}" data-position="{{ card.position }}">
+                    {% if editing_card_id == card.id %}
+                    <form data-action="submit->page#run" data-liveview-function="board_detail->edit_card" data-card-id="{{ card.id }}" data-board-id="{{ board.id }}">
+                        <input type="text" name="title" value="{{ card.title }}" data-liveview-focus="true">
+                        <div class="btn-group">
+                            <button type="button" data-action="click->page#run" data-liveview-function="board_detail->send_page" data-board-id="{{ board.id }}" class="btn-secondary">キャンセル</button>
+                            <button type="submit" class="btn-primary">保存</button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <span class="card-title">{{ card.title }}</span>
+                    <div class="actions">
+                        <button data-action="click->page#run" data-liveview-function="board_detail->show_edit_card" data-card-id="{{ card.id }}" data-board-id="{{ board.id }}">編集</button>
+                        <button data-action="click->page#run" data-liveview-function="board_detail->remove_card" data-card-id="{{ card.id }}" data-board-id="{{ board.id }}">削除</button>
+                    </div>
+                    <div class="move-buttons">
+                        {% if not forloop.first %}
+                        <button data-action="click->page#run" data-liveview-function="board_detail->move_card_up" data-card-id="{{ card.id }}" data-list-id="{{ list.id }}" data-board-id="{{ board.id }}" title="上へ移動">↑</button>
+                        {% endif %}
+                        {% if not forloop.last %}
+                        <button data-action="click->page#run" data-liveview-function="board_detail->move_card_down" data-card-id="{{ card.id }}" data-list-id="{{ list.id }}" data-board-id="{{ board.id }}" title="下へ移動">↓</button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% if adding_card_to_list_id == list.id %}
+            <div class="form-container">
+                <form data-action="submit->page#run" data-liveview-function="board_detail->add_card" data-list-id="{{ list.id }}" data-board-id="{{ board.id }}">
+                    <input type="text" name="title" placeholder="カードのタイトルを入力" data-liveview-focus="true">
+                    <div class="btn-group">
+                        <button type="submit" class="btn-primary">追加</button>
+                        <button type="button" data-action="click->page#run" data-liveview-function="board_detail->send_page" data-board-id="{{ board.id }}" class="btn-secondary">キャンセル</button>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <button class="add-card-btn" data-action="click->page#run" data-liveview-function="board_detail->show_add_card_form" data-list-id="{{ list.id }}" data-board-id="{{ board.id }}">+ カードを追加</button>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <div class="new-list">
+            {% if show_add_list_form %}
+            <div class="form-container">
+                <form data-action="submit->page#run" data-liveview-function="board_detail->add_list" data-board-id="{{ board.id }}">
+                    <input type="text" name="name" placeholder="リスト名を入力" data-liveview-focus="true">
+                    <div class="btn-group">
+                        <button type="submit" class="btn-primary">追加</button>
+                        <button type="button" data-action="click->page#run" data-liveview-function="board_detail->send_page" data-board-id="{{ board.id }}" class="btn-secondary">キャンセル</button>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <button data-action="click->page#run" data-liveview-function="board_detail->show_add_list_form" data-board-id="{{ board.id }}">+ リストを追加</button>
+            {% endif %}
+        </div>
+    </div>
+</div>

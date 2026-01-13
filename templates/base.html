@@ -1,14 +1,24 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
-        <meta name="description" content="Django Template">
-        <meta name="keywords" content="Django">
+        <meta name="description" content="Trello風TODOアプリ">
+        <meta name="keywords" content="Django, LiveView, Trello, TODO">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Django Template</title>
+        <title id="title">{% block title %}Trello風TODOアプリ{% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
     </head>
     <body>
-        {% block content %}
-        {% endblock %}
+        <div id="no-connection" class="no-connection--hide">
+            <div class="no-connection-content">
+                <p>接続が切断されました。再接続中...</p>
+            </div>
+        </div>
+        <div id="main" data-controller="page">
+            {% block content %}
+            {% endblock %}
+        </div>
+        <script src="{% static 'liveview/liveview.js' %}"></script>
     </body>
 </html>

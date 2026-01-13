@@ -5,8 +5,12 @@ description = "django project"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "Django==5.2.9",
+    "Django==6.0",
     "psycopg2==2.9.11",
+    "django-liveview==2.1.8",
+    "daphne>=4.2.1",
+    "channels==4.3.2",
+    "channels-redis>=4.3.0",
 ]
 
 [tool.uv]
@@ -14,13 +18,14 @@ link-mode = "copy"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+DJANGO_SETTINGS_MODULE = "config.settings"
 
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]
 mypy_path = "."
 
 [[tool.mypy.overrides]]
-module = ["debug_toolbar.*"]
+module = ["debug_toolbar.*", "liveview.*", "channels.*", "channels_redis.*", "daphne.*"]
 ignore_missing_imports = true
 
 [tool.django-stubs]
@@ -36,14 +41,13 @@ select = [
 
 [dependency-groups]
 dev = [
-    "ruff==0.14.7",
-    "pytest==9.0.1",
-    "django-debug-toolbar==6.1.0",
+    "ruff==0.14.10",
+    "pytest==9.0.2",
     "pytest-django==4.11.1",
     "factory-boy==3.3.3",
     "djlint==1.36.4",
     "django-stubs[compatible-mypy]==5.2.8",
-    "djcheckup>=0.5.0",
+    "djcheckup==0.6.0",
 ]
 
 
